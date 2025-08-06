@@ -1,214 +1,213 @@
-<script type="text/javascript">
-        var gk_isXlsx = false;
-        var gk_xlsxFileLookup = {};
-        var gk_fileData = {};
-        function filledCell(cell) {
-          return cell !== '' && cell != null;
-        }
-        function loadFileData(filename) {
-        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
-            try {
-                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
-                var firstSheetName = workbook.SheetNames[0];
-                var worksheet = workbook.Sheets[firstSheetName];
-
-                // Convert sheet to JSON to filter blank rows
-                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
-                // Filter out blank rows (rows where all cells are empty, null, or undefined)
-                var filteredData = jsonData.filter(row => row.some(filledCell));
-
-                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
-                var headerRowIndex = filteredData.findIndex((row, index) =>
-                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
-                );
-                // Fallback
-                if (headerRowIndex === -1 || headerRowIndex > 25) {
-                  headerRowIndex = 0;
-                }
-
-                // Convert filtered JSON back to CSV
-                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
-                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
-                return csv;
-            } catch (e) {
-                console.error(e);
-                return "";
-            }
-        }
-        return gk_fileData[filename] || "";
-        }
-        </script><!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en-US">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Engineering Leadership Readiness Portfolio</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
   <style>
+    /* Custom styles for additional enhancements */
     body {
-      font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 0;
-      line-height: 1.6;
-      background-color: #f4f4f4;
       min-height: 100vh;
       display: flex;
       flex-direction: column;
+      scroll-behavior: smooth;
     }
-    header {
-      background: #003087; /* Dark blue */
-      color: #fff;
-      padding: 10px 0;
-      text-align: center;
+    .section {
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.5s ease, transform 0.5s ease;
     }
-    nav {
-      background: #005b96; /* Medium blue */
-      padding: 10px;
+    .section.visible {
+      opacity: 1;
+      transform: translateY(0);
     }
-    nav ul {
-      list-style: none;
-      padding: 0;
-      display: flex;
-      justify-content: center;
+    .nav-link.active {
+      border-bottom: 2px solid #ffffff;
     }
-    nav ul li {
-      margin: 0 15px;
-    }
-    nav ul li a {
-      color: #fff;
-      text-decoration: none;
-      font-weight: bold;
-    }
-    nav ul li a:hover, nav ul li a:focus {
-      text-decoration: underline;
-      outline: none;
-    }
-    main {
-      flex: 1;
-    }
-    section {
-      padding: 20px;
-      margin: 20px;
-      background: #fff;
-      border-radius: 5px;
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-      overflow: auto;
-    }
-    h1, h2 {
-      color: #333;
-    }
-    .download-link {
-      display: inline-block;
-      margin: 10px 0;
-      padding: 10px 15px;
-      background: #003087; /* Dark blue */
-      color: #fff;
-      text-decoration: none;
-      border-radius: 5px;
-    }
-    .download-link:hover, .download-link:focus {
-      background: #0077cc; /* Lighter blue */
-      outline: none;
-    }
-    .gantt-chart-img {
-      max-width: 100%;
-      height: auto;
-      margin: 10px 0;
-    }
-    footer {
-      text-align: center;
-      padding: 10px;
-      background: #003087; /* Dark blue */
-      color: #fff;
-      width: 100%;
+    #back-to-top {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      display: none;
+      z-index: 1000;
     }
   </style>
 </head>
-<body>
-  <header>
-    <h1>Engineering Leadership Readiness Portfolio</h1>
+<body class="font-sans text-gray-800 bg-gray-100">
+  <header class="bg-gradient-to-r from-blue-900 to-blue-700 text-white py-6 text-center">
+    <h1 class="text-4xl font-bold">Engineering Leadership Readiness Portfolio</h1>
   </header>
 
-  <nav aria-label="Main navigation">
-    <ul>
-      <li><a href="#home">Home</a></li>
-      <li><a href="#systems-thinking">Systems Thinking</a></li>
-      <li><a href="#team-communication">Team Communication</a></li>
-      <li><a href="#project-timeline">Project Timeline</a></li>
-      <li><a href="#career-performance-strategy">Career & Performance Strategy</a></li>
-      <li><a href="#ethics-cultural-readiness">Ethics & Cultural Readiness</a></li>
-      <li><a href="#contact">Contact</a></li>
+  <nav class="bg-blue-600 py-4 sticky top-0 z-50" aria-label="Main navigation">
+    <ul class="flex justify-center space-x-6">
+      <li><a href="#home" class="nav-link text-white font-semibold hover:text-blue-200 focus:text-blue-200">Home</a></li>
+      <li><a href="#systems-thinking" class="nav-link text-white font-semibold hover:text-blue-200 focus:text-blue-200">Systems Thinking</a></li>
+      <li><a href="#team-communication" class="nav-link text-white font-semibold hover:text-blue-200 focus:text-blue-200">Team Communication</a></li>
+      <li><a href="#project-timeline" class="nav-link text-white font-semibold hover:text-blue-200 focus:text-blue-200">Project Timeline</a></li>
+      <li><a href="#career-performance-strategy" class="nav-link text-white font-semibold hover:text-blue-200 focus:text-blue-200">Career & Performance</a></li>
+      <li><a href="#ethics-cultural-readiness" class="nav-link text-white font-semibold hover:text-blue-200 focus:text-blue-200">Ethics & Culture</a></li>
+      <li><a href="#contact" class="nav-link text-white font-semibold hover:text-blue-200 focus:text-blue-200">Contact</a></li>
     </ul>
   </nav>
 
-  <main>
-    <section id="home">
-      <h2>Welcome</h2>
-      <p>This portfolio showcases my readiness to lead civil engineering projects with a focus on systems thinking, effective communication, and ethical responsibility.</p>
-      <p><strong>Mission:</strong> To drive civil engineering projects that balance technical excellence, stakeholder collaboration, and ethical responsibility, delivering within time, cost, and scope while prioritizing safety and sustainability.</p>
-      <p><strong>Career Goals:</strong> To manage large-scale civil engineering projects, such as bridges, highways, and sustainable urban developments, fostering innovation and empowering interdisciplinary teams to create lasting value.</p>
+  <main class="flex-1 max-w-6xl mx-auto p-6">
+    <section id="home" class="section bg-white rounded-lg shadow-lg p-8 mb-6">
+      <h2 class="text-3xl font-semibold text-blue-900 mb-4">Welcome</h2>
+      <p class="text-lg">This portfolio showcases my readiness to lead civil engineering projects with a focus on systems thinking, effective communication, and ethical responsibility.</p>
+      <p class="text-lg mt-4"><strong>Mission:</strong> To drive civil engineering projects that balance technical excellence, stakeholder collaboration, and ethical responsibility, delivering within time, cost, and scope while prioritizing safety and sustainability.</p>
+      <p class="text-lg mt-4"><strong>Career Goals:</strong> To manage large-scale civil engineering projects, such as bridges, highways, and sustainable urban developments, fostering innovation and empowering interdisciplinary teams to create lasting value.</p>
     </section>
 
-    <section id="systems-thinking" class="section">
-      <h2>Systems Thinking Toolkit</h2>
-      <p>This section highlights my capability as an engineering leader to navigate the intricate dynamics of team management, process optimization, and innovation through a systems thinking approach. My toolkit is designed to anticipate complexity and its cascading effects, featuring:</p>
-      <ul>
-        <li><strong>Causal Loop Diagrams:</strong> A strategic tool I employ to map the interdependencies of leadership decisions, revealing how small actions—like adjusting team workloads—trigger feedback loops that influence project outcomes and team morale. View the diagram: <a href="Construction_Delays_CLD.pdf" target="_blank">View Causal Loop Diagram (PDF)</a>. Read the reflection: <a href="Systems_Thinking_Reflection.pdf" target="_blank">View Systems Thinking Reflection (PDF)</a>.</li>
+    <section id="systems-thinking" class="section bg-white rounded-lg shadow-lg p-8 mb-6">
+      <h2 class="text-3xl font-semibold text-blue-900 mb-4">Systems Thinking Toolkit</h2>
+      <p class="text-lg">This section highlights my capability as an engineering leader to navigate the intricate dynamics of team management, process optimization, and innovation through a systems thinking approach. My toolkit is designed to anticipate complexity and its cascading effects, featuring:</p>
+      <ul class="list-disc pl-6 mt-4">
+        <li><strong>Causal Loop Diagrams:</strong> A strategic tool I employ to map the interdependencies of leadership decisions, revealing how small actions—like adjusting team workloads—trigger feedback loops that influence project outcomes and team morale. View the diagram: <a href="Construction_Delays_CLD.pdf" target="_blank" class="text-blue-600 hover:underline">View Causal Loop Diagram (PDF)</a>. Read the reflection: <a href="Systems_Thinking_Reflection.pdf" target="_blank" class="text-blue-600 hover:underline">View Systems Thinking Reflection (PDF)</a>.</li>
         <li><strong>Feedback Analysis Frameworks:</strong> A method I use to identify and manage reinforcing and balancing loops, ensuring proactive adjustments to maintain system stability and long-term success.</li>
         <li><strong>Scenario Planning Models:</strong> An approach I apply to forecast the long-term consequences of innovation efforts, such as integrating new technologies, by evaluating their impact across teams, processes, and stakeholder expectations.</li>
       </ul>
-      <p>These tools empower me to foresee unintended consequences, optimize decision-making, and foster resilient engineering systems. Explore a practical application with: <a href="Engineering_Decision_Example.pdf" target="_blank">View Systems-Based Decision Example (PDF)</a>.</p>
+      <p class="text-lg mt-4">These tools empower me to foresee unintended consequences, optimize decision-making, and foster resilient engineering systems. Explore a practical application with: <a href="Engineering_Decision_Example.pdf" target="_blank" class="text-blue-600 hover:underline">View Systems-Based Decision Example (PDF)</a>.</p>
     </section>
 
-    <section id="team-communication">
-      <h2>Team Communication & Feedback</h2>
-      <p>This section showcases my approach to fostering effective communication and continuous feedback as an engineering leader, ensuring clear instructions, professional conflict resolution, and team growth.</p>
-      <ul>
-        <li><strong>Leadership Communication Style Statement:</strong> A detailed description of my approach to delivering project instructions, handling conflict, and adapting communication for diverse teams. <a href="Leadership_Communication_Style.pdf" target="_blank">View Leadership Communication Style Statement (PDF)</a>.</li>
-        <li><strong>Team Meeting Agenda Template:</strong> A professional agenda for weekly team check-ins, including objectives, time blocks, and action items to ensure productive meetings. <a href="Team_Meeting_Agenda.pdf" target="_blank">View Team Meeting Agenda Template (PDF)</a>.</li>
-        <li><strong>Peer or Team Feedback Form:</strong> A template for collecting anonymous feedback on leadership and project issues, with sections for communication, support, performance, and suggestions. <a href="Team_Feedback_Form.pdf" target="_blank">View Peer or Team Feedback Form (PDF)</a>.</li>
-        <li><strong>Performance Review Coaching Script:</strong> A constructive script for delivering feedback to an underperforming team member with a growth mindset. <a href="Performance_Coaching_Script.pdf" target="_blank">View Performance Review Coaching Script (PDF)</a>.</li>
+    <section id="team-communication" class="section bg-white rounded-lg shadow-lg p-8 mb-6">
+      <h2 class="text-3xl font-semibold text-blue-900 mb-4">Team Communication & Feedback</h2>
+      <p class="text-lg">This section showcases my approach to fostering effective communication and continuous feedback as an engineering leader, ensuring clear instructions, professional conflict resolution, and team growth.</p>
+      <ul class="list-disc pl-6 mt-4">
+        <li><strong>Leadership Communication Style Statement:</strong> A detailed description of my approach to delivering project instructions, handling conflict, and adapting communication for diverse teams. <a href="Leadership_Communication_Style.pdf" target="_blank" class="text-blue-600 hover:underline">View Leadership Communication Style Statement (PDF)</a>.</li>
+        <li><strong>Team Meeting Agenda Template:</strong> A professional agenda for weekly team check-ins, including objectives, time blocks, and action items to ensure productive meetings. <a href="Team_Meeting_Agenda.pdf" target="_blank" class="text-blue-600 hover:underline">View Team Meeting Agenda Template (PDF)</a>.</li>
+        <li><strong>Peer or Team Feedback Form:</strong> A template for collecting anonymous feedback on leadership and project issues, with sections for communication, support, performance, and suggestions. <a href="Team_Feedback_Form.pdf" target="_blank" class="text-blue-600 hover:underline">View Peer or Team Feedback Form (PDF)</a>.</li>
+        <li><strong>Performance Review Coaching Script:</strong> A constructive script for delivering feedback to an underperforming team member with a growth mindset. <a href="Performance_Coaching_Script.pdf" target="_blank" class="text-blue-600 hover:underline">View Performance Review Coaching Script (PDF)</a>.</li>
       </ul>
     </section>
 
-    <section id="project-timeline">
-      <h2>Project Timeline</h2>
-      <p>This section presents a Gantt chart detailing the timeline for developing my ELR Web Portfolio, from planning to final presentation. The chart includes tasks such as developing systems thinking tools, defining communication strategies, and finalizing the website, spanning May 12, 2025, to August 13, 2025.</p>
-       Gantt chart for ELR Web Portfolio development, May 12 to August 13, 2025 
-      <p><a href="gantt-chart.pdf" target="_blank" class="download-link">Download Gantt Chart as PDF</a></p>
+    <section id="project-timeline" class="section bg-white rounded-lg shadow-lg p-8 mb-6">
+      <h2 class="text-3xl font-semibold text-blue-900 mb-4">Project Timeline</h2>
+      <p class="text-lg">This section presents a Gantt chart detailing the timeline for developing my ELR Web Portfolio, from planning to final presentation. The chart includes tasks such as developing systems thinking tools, defining communication strategies, and finalizing the website, spanning May 12, 2025, to August 13, 2025.</p>
+      <p class="mt-4"><a href="gantt-chart.pdf" target="_blank" class="inline-block bg-blue-900 text-white py-2 px-4 rounded-lg hover:bg-blue-700 focus:bg-blue-700">Download Gantt Chart as PDF</a></p>
     </section>
 
-    <section id="career-performance-strategy">
-      <h2>Career & Performance Strategy</h2>
-      <p>This section showcases my approach to professional growth and performance management as an engineering leader, emphasizing cultural sensitivity, ethical responsibility, and team development.</p>
-      <ul>
-        <li><strong>Career Advancement Plan:</strong> A plan detailing my 90-day and long-term goals as an engineering leader, including skills development and mentorship for culturally adaptive and ethical project management. <a href="Career_Advancement_Plan.pdf" target="_blank">View Career Advancement Plan (PDF)</a>.</li>
-        <li><strong>Self-Assessment & Reflection Form:</strong> A form for evaluating my leadership strengths, areas for improvement, progress toward goals, and action items to enhance ethical and inclusive practices. <a href="Self_Assessment_Form.pdf" target="_blank">View Self-Assessment & Reflection Form (PDF)</a>.</li>
-        <li><strong>Mock Performance Evaluation Template:</strong> A template to assess a junior engineer’s performance, focusing on communication, collaboration, problem-solving, delivery, and quality with an ethical lens. <a href="Performance_Evaluation_Template.pdf" target="_blank">View Mock Performance Evaluation Template (PDF)</a>.</li>
+    <section id="career-performance-strategy" class="section bg-white rounded-lg shadow-lg p-8 mb-6">
+      <h2 class="text-3xl font-semibold text-blue-900 mb-4">Career & Performance Strategy</h2>
+      <p class="text-lg">This section showcases my approach to professional growth and performance management as an engineering leader, emphasizing cultural sensitivity, ethical responsibility, and team development.</p>
+      <ul class="list-disc pl-6 mt-4">
+        <li><strong>Career Advancement Plan:</strong> A plan detailing my 90-day and long-term goals as an engineering leader, including skills development and mentorship for culturally adaptive and ethical project management. <a href="Career_Advancement_Plan.pdf" target="_blank" class="text-blue-600 hover:underline">View Career Advancement Plan (PDF)</a>.</li>
+        <li><strong>Self-Assessment & Reflection Form:</strong> A form for evaluating my leadership strengths, areas for improvement, progress toward goals, and action items to enhance ethical and inclusive practices. <a href="Self_Assessment_Form.pdf" target="_blank" class="text-blue-600 hover:underline">View Self-Assessment & Reflection Form (PDF)</a>.</li>
+        <li><strong>Mock Performance Evaluation Template:</strong> A template to assess a junior engineer’s performance, focusing on communication, collaboration, problem-solving, delivery, and quality with an ethical lens. <a href="Performance_Evaluation_Template.pdf" target="_blank" class="text-blue-600 hover:underline">View Mock Performance Evaluation Template (PDF)</a>.</li>
       </ul>
     </section>
 
-    <section id="ethics-cultural-readiness">
-      <h2>Ethics & Cultural Readiness</h2>
-      <p>This section highlights my commitment to ethical leadership and cultural sensitivity in civil engineering, ensuring projects align with high moral standards and respect diverse perspectives.</p>
-      <ul>
-        <li><strong>Ethical Decision-Making:</strong> An analysis of navigating complex ethical challenges, demonstrating my approach to balancing project demands with integrity and accountability. <a href="Ethical_Dilemma_Response.pdf" target="_blank">View Ethical Decision-Making (PDF)</a>.</li>
-        <li><strong>Leadership Code of Ethics:</strong> A concise framework of core principles guiding my professional conduct, emphasizing transparency, safety, and equitable practices. <a href="Engineering_Leadership_Code_of_Ethics.pdf" target="_blank">View Leadership Code of Ethics (PDF)</a>.</li>
-        <li><strong>Cultural Integration:</strong> Insights into adapting to diverse engineering environments, bridging cultural differences to foster collaboration and innovation. <a href="Cultural_Adaptation_Reflection.pdf" target="_blank">View Cultural Integration (PDF)</a>.</li>
+    <section id="ethics-cultural-readiness" class="section bg-white rounded-lg shadow-lg p-8 mb-6">
+      <h2 class="text-3xl font-semibold text-blue-900 mb-4">Ethics & Cultural Readiness</h2>
+      <p class="text-lg">This section highlights my commitment to ethical leadership and cultural sensitivity in civil engineering, ensuring projects align with high moral standards and respect diverse perspectives.</p>
+      <ul class="list-disc pl-6 mt-4">
+        <li><strong>Ethical Decision-Making:</strong> An analysis of navigating complex ethical challenges, demonstrating my approach to balancing project demands with integrity and accountability. <a href="Ethical_Dilemma_Response.pdf" target="_blank" class="text-blue-600 hover:underline">View Ethical Decision-Making (PDF)</a>.</li>
+        <li><strong>Leadership Code of Ethics:</strong> A concise framework of core principles guiding my professional conduct, emphasizing transparency, safety, and equitable practices. <a href="Engineering_Leadership_Code_of_Ethics.pdf" target="_blank" class="text-blue-600 hover:underline">View Leadership Code of Ethics (PDF)</a>.</li>
+        <li><strong>Cultural Integration:</strong> Insights into adapting to diverse engineering environments, bridging cultural differences to foster collaboration and innovation. <a href="Cultural_Adaptation_Reflection.pdf" target="_blank" class="text-blue-600 hover:underline">View Cultural Integration (PDF)</a>.</li>
       </ul>
     </section>
-          
-    <section id="contact">
-      <h2>Contact</h2>
-      <p>Connect with me to learn more about my qualifications and vision for civil engineering leadership:</p>
-      <p>
-        <a href="Manohar_Resume.pdf" target="_blank" class="download-link">Download Résumé</a><br>
-        <a href="https://linkedin.com/in/manohar-bathula-874537235" target="_blank" class="download-link">LinkedIn Profile</a>
+
+    <section id="contact" class="section bg-white rounded-lg shadow-lg p-8 mb-6">
+      <h2 class="text-3xl font-semibold text-blue-900 mb-4">Contact</h2>
+      <p class="text-lg">Connect with me to learn more about my qualifications and vision for civil engineering leadership:</p>
+      <p class="mt-4">
+        <a href="Manohar_Resume.pdf" target="_blank" class="inline-block bg-blue-900 text-white py-2 px-4 rounded-lg hover:bg-blue-700 focus:bg-blue-700 mr-4">Download Résumé</a>
+        <a href="https://linkedin.com/in/manohar-bathula-874537235" target="_blank" class="inline-block bg-blue-900 text-white py-2 px-4 rounded-lg hover:bg-blue-700 focus:bg-blue-700">LinkedIn Profile</a>
       </p>
     </section>
   </main>
 
-  <footer>
+  <button id="back-to-top" class="bg-blue-900 text-white py-2 px-4 rounded-lg hover:bg-blue-700 focus:bg-blue-700">Back to Top</button>
+
+  <footer class="bg-blue-900 text-white text-center py-4">
     <p>© 2025 Engineering Leadership Readiness Portfolio</p>
   </footer>
+
+  <script type="text/javascript">
+    var gk_isXlsx = false;
+    var gk_xlsxFileLookup = {};
+    var gk_fileData = {};
+    function filledCell(cell) {
+      return cell !== '' && cell != null;
+    }
+    function loadFileData(filename) {
+      if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+        try {
+          var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+          var firstSheetName = workbook.SheetNames[0];
+          var worksheet = workbook.Sheets[firstSheetName];
+          var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+          var filteredData = jsonData.filter(row => row.some(filledCell));
+          var headerRowIndex = filteredData.findIndex((row, index) =>
+            row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+          );
+          if (headerRowIndex === -1 || headerRowIndex > 25) {
+            headerRowIndex = 0;
+          }
+          var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex));
+          csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+          return csv;
+        } catch (e) {
+          console.error(e);
+          return "";
+        }
+      }
+      return gk_fileData[filename] || "";
+    }
+
+    // Smooth scrolling for navigation links
+    document.querySelectorAll('.nav-link').forEach(anchor => {
+      anchor.addEventListener('click', function(e) {
+        e.preventDefault();
+        const targetId = this.getAttribute('href').substring(1);
+        const targetElement = document.getElementById(targetId);
+        targetElement.scrollIntoView({ behavior: 'smooth' });
+      });
+    });
+
+    // Highlight active navigation link on scroll
+    window.addEventListener('scroll', () => {
+      const sections = document.querySelectorAll('.section');
+      const navLinks = document.querySelectorAll('.nav-link');
+      let current = '';
+      sections.forEach(section => {
+        const sectionTop = section.offsetTop;
+        if (scrollY >= sectionTop - 60) {
+          current = section.getAttribute('id');
+        }
+      });
+      navLinks.forEach(link => {
+        link.classList.remove('active');
+        if (link.getAttribute('href').substring(1) === current) {
+          link.classList.add('active');
+        }
+      });
+    });
+
+    // Fade-in animation for sections on scroll
+    const sections = document.querySelectorAll('.section');
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+        }
+      });
+    }, { threshold: 0.1 });
+    sections.forEach(section => observer.observe(section));
+
+    // Back to Top button functionality
+    const backToTopButton = document.getElementById('back-to-top');
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 300) {
+        backToTopButton.style.display = 'block';
+      } else {
+        backToTopButton.style.display = 'none';
+      }
+    });
+    backToTopButton.addEventListener('click', () => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  </script>
 </body>
 </html>
